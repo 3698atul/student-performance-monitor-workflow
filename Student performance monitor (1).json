@@ -1,0 +1,210 @@
+{
+  "name": "Student performance monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1yvh1rh9PAH8GwI7Cj2Q4psuZYBzQ-fUjXOP_tax6aaE",
+          "mode": "list",
+          "cachedResultName": "Student performance(Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yvh1rh9PAH8GwI7Cj2Q4psuZYBzQ-fUjXOP_tax6aaE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 154340238,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yvh1rh9PAH8GwI7Cj2Q4psuZYBzQ-fUjXOP_tax6aaE/edit#gid=154340238"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "84ed58e6-9a08-4ecc-a22c-1c11ccd2bef0",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "SErrNnPbXlNUvWAD",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "42c82a98-ad2b-4cf6-bab1-23ccf4d2ba66",
+              "leftValue": "={{ $json.Attendance_percent }}",
+              "rightValue": 75,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            },
+            {
+              "id": "5ee936ba-005c-459a-b8b1-9913b54720f2",
+              "leftValue": "={{ $json.ExamScore }}",
+              "rightValue": 40,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c8798cac-35a3-4929-b5e9-ce1763852411",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U097UU43NTC",
+          "mode": "list",
+          "cachedResultName": "atulk36987"
+        },
+        "text": "={{ $('Google Sheets Trigger').item.json['Student Name'] }}you have attendance of {{ $('Google Sheets Trigger').item.json.Attendance_percent }} hwich is low and your exam score is{{ $('Google Sheets Trigger').item.json.ExamScore }} that is also low you really need to improve your performace.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "7cd1b8ee-dd2f-4a2f-80ab-ca292810ca7d",
+      "name": "Send a message",
+      "webhookId": "7417333a-b0b2-4918-9bb9-6400c3a8506a",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "Vi7UnV30fe7bxgNo",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "+916006603698",
+        "toWhatsapp": true,
+        "message": "=Respected sir/mam your ward  {{ $('If').item.json['Student Name'] }} has the attendance of {{ $('If').item.json.Attendance_percent }} which is low and your ward has scored has scored {{ $('If').item.json.ExamScore }} in the exam which is not a good performance.He really need to improve his performance",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "277d6d30-9e22-467b-be63-d709dd3a968b",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "EkZ93hjiKIACoOo9",
+          "name": "Twilio account 5"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        416,
+        96
+      ],
+      "id": "981714f7-4e21-477c-8ecd-18c601550993",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "10942289-a2ed-4f49-9c3f-66220a80b9b0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4ea388abf55e1fbe567ebb1b54f7135ac52c4b256694081c47e674b493e75be5"
+  },
+  "id": "8H6PFVra1igUL1Em",
+  "tags": []
+}
